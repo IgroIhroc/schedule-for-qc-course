@@ -67,28 +67,6 @@
   - `schedule = []`
   - гілка EMPTY_SCHEDULE
 
----
-
-## Чому деякі branches не покриті?
-
-**checkSemesterEnd**
-- частина невалідних дат не викликає різні гілки трансформації
-
-**getWeekParity**
-- не покрита гілка:
-  - `targetDate < semesterStart → return 0`
-
-**renderGroupCells**
-- складні вкладені умови не всі перевірені тестами:
-  - `card !== null`
-  - `skip_render`
-  - `weekly_render`
-  - `isEqual(card, tempCard)`
-
-**Mutation testing**
-- частина умов типу `currentDay === day && currentWeekType === isOddWeek`
-  не покрита всіма комбінаціями значень
-
 ## Скріншот
 ![alt text](image-3.png)
 ![alt text](image.png)
