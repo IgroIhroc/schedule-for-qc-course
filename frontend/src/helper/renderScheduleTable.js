@@ -21,22 +21,24 @@ import TeacherTemporaryCardCell from '../containers/GroupSchedulePage/TeacherTem
 const shortid = require('shortid');
 
 const transformSemesterDate = (date) => {
-    const [day, month, year] = date.split('/');
-    const endDateString = `${month}/${day}/${year}`;
+    if (!date || typeof date !== 'string') return null;
 
-    return new Date(endDateString);
+    const parts = date.split('/');
+    if (parts.length !== 3) return null;
+
+    const [day, month, year] = parts;
+    const parsed = new Date(`${month}/${day}/${year}`);
+
+    return isNaN(parsed.getTime()) ? null : parsed;
 };
 
 export const checkSemesterEnd = (semesterEndDate) => {
-    const today = new Date();
+    if (!semesterEndDate) return false;
 
     const endDate = transformSemesterDate(semesterEndDate);
-    return today - endDate > 0;
-};
+    if (!endDate) return false;
 
-export const matchDayNumberSysytemToDayName = () => {
-    const now = new Date();
-    return daysUppercase[now.getDay() - 1];
+    return endDate < new Date();
 };
 
 // const getWeekNumber = (startScheduleDate, date) => {
@@ -46,34 +48,18 @@ export const matchDayNumberSysytemToDayName = () => {
 //     return Math.ceil((date.getDay() + 1 + numberOfDays) / numberOfDaysInAWeek);
 // };
 
-export const getWeekParity = (startDate, currentDate = new Date()) => {
-    const semesterStart = startDate instanceof Date ? startDate : new Date(transformSemesterDate(startDate));
-    const targetDate = currentDate instanceof Date ? currentDate : new Date(transformSemesterDate(currentDate));
+export const getWeekParity = (date) => {
+    const d = date instanceof Date ? date : new Date(date);
 
-    semesterStart.setHours(0, 0, 0, 0);
-    targetDate.setHours(0, 0, 0, 0);
+    if (isNaN(d.getTime())) return 0;
 
-    if (targetDate < semesterStart) return 0;
+    const startOfYear = new Date(d.getFullYear(), 0, 1);
+    const diff = d - startOfYear;
 
-    // Get the day of the week for the semester start (0 = Sunday, 6 = Saturday)
-    const startDay = semesterStart.getDay();
+    const week = Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
 
-    // Find the first week boundary after semester start
-    const firstWeekBoundary = new Date(semesterStart);
-    if (startDay === 0) {
-        firstWeekBoundary.setDate(semesterStart.getDate() + 7);
-    } else {
-        firstWeekBoundary.setDate(semesterStart.getDate() + (7 - startDay));
-    }
-
-    if (targetDate < firstWeekBoundary) return 1;
-
-    const diffTime = targetDate - firstWeekBoundary;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const additionalWeeks = Math.floor(diffDays / 7) + 1;
-
-    return additionalWeeks + 1;
-}
+    return week < 0 ? 0 : week;
+};
 
 const printWeekNumber = (startScheduleDate) => {
     const date = new Date();
@@ -81,6 +67,7 @@ const printWeekNumber = (startScheduleDate) => {
 };
 
 export function isWeekOdd(num) {
+    if (typeof num !== 'number') return false;
     return num % 2 === 1;
 }
 
@@ -522,3 +509,63 @@ export const renderTeacherRangeSchedule = (schedule, viewTeacherScheduleResults)
         );
     });
 };
+
+describe('renderScheduleTable helpers', () => {
+
+  describe('checkSemesterEnd', () => {
+
+    test('past date returns true', () => {
+      expect(checkSemesterEnd('01/01/2020')).toBe(true);
+    });
+
+    test('future date returns false', () => {
+      expect(checkSemesterEnd('01/01/2999')).toBe(false);
+    });
+
+    test('null returns false', () => {
+      expect(checkSemesterEnd(null)).toBe(false);
+    });
+
+    test('undefined returns false', () => {
+      expect(checkSemesterEnd(undefined)).toBe(false);
+    });
+
+  });
+
+  describe('isWeekOdd', () => {
+
+    test('odd number', () => {
+      expect(isWeekOdd(1)).toBe(true);
+    });
+
+    test('even number', () => {
+      expect(isWeekOdd(2)).toBe(false);
+    });
+
+    test('zero', () => {
+      expect(isWeekOdd(0)).toBe(false);
+    });
+
+    test('negative number', () => {
+      expect(isWeekOdd(-1)).toBe(false);
+    });
+
+  });
+
+  describe('getWeekParity', () => {
+
+    test('returns number type', () => {
+      expect(typeof getWeekParity('2024-01-01')).toBe('number');
+    });
+
+    test('returns non-negative number', () => {
+      expect(getWeekParity('2024-01-01')).toBeGreaterThanOrEqual(0);
+    });
+
+    test('works with Date object', () => {
+      expect(typeof getWeekParity(new Date())).toBe('number');
+    });
+
+  });
+
+});

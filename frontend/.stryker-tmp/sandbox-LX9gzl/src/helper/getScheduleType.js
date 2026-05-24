@@ -1,0 +1,85 @@
+// @ts-nocheck
+function stryNS_9fa48() {
+  var g = typeof globalThis === 'object' && globalThis && globalThis.Math === Math && globalThis || new Function("return this")();
+  var ns = g.__stryker__ || (g.__stryker__ = {});
+  if (ns.activeMutant === undefined && g.process && g.process.env && g.process.env.__STRYKER_ACTIVE_MUTANT__) {
+    ns.activeMutant = g.process.env.__STRYKER_ACTIVE_MUTANT__;
+  }
+  function retrieveNS() {
+    return ns;
+  }
+  stryNS_9fa48 = retrieveNS;
+  return retrieveNS();
+}
+stryNS_9fa48();
+function stryCov_9fa48() {
+  var ns = stryNS_9fa48();
+  var cov = ns.mutantCoverage || (ns.mutantCoverage = {
+    static: {},
+    perTest: {}
+  });
+  function cover() {
+    var c = cov.static;
+    if (ns.currentTestId) {
+      c = cov.perTest[ns.currentTestId] = cov.perTest[ns.currentTestId] || {};
+    }
+    var a = arguments;
+    for (var i = 0; i < a.length; i++) {
+      c[a[i]] = (c[a[i]] || 0) + 1;
+    }
+  }
+  stryCov_9fa48 = cover;
+  cover.apply(null, arguments);
+}
+function stryMutAct_9fa48(id) {
+  var ns = stryNS_9fa48();
+  function isActive(id) {
+    if (ns.activeMutant === id) {
+      if (ns.hitCount !== void 0 && ++ns.hitCount > ns.hitLimit) {
+        throw new Error('Stryker: Hit count limit reached (' + ns.hitCount + ')');
+      }
+      return true;
+    }
+    return false;
+  }
+  stryMutAct_9fa48 = isActive;
+  return isActive(id);
+}
+import { get } from 'lodash';
+import { FULL, GROUP, TEACHER, DEPARTMENT } from '../constants/scheduleTypes';
+export const getScheduleType = values => {
+  if (stryMutAct_9fa48("0")) {
+    {}
+  } else {
+    stryCov_9fa48("0");
+    if (stryMutAct_9fa48("3") ? false : stryMutAct_9fa48("2") ? true : stryMutAct_9fa48("1") ? values : (stryCov_9fa48("1", "2", "3"), !values)) return FULL;
+    const group = get(values, stryMutAct_9fa48("4") ? "" : (stryCov_9fa48("4"), 'group'));
+    const teacher = get(values, stryMutAct_9fa48("5") ? "" : (stryCov_9fa48("5"), 'teacher'));
+    const department = get(values, stryMutAct_9fa48("6") ? "" : (stryCov_9fa48("6"), 'department'));
+    if (stryMutAct_9fa48("8") ? false : stryMutAct_9fa48("7") ? true : (stryCov_9fa48("7", "8"), get(group, stryMutAct_9fa48("9") ? "" : (stryCov_9fa48("9"), 'id')))) {
+      if (stryMutAct_9fa48("10")) {
+        {}
+      } else {
+        stryCov_9fa48("10");
+        return GROUP;
+      }
+    }
+    if (stryMutAct_9fa48("12") ? false : stryMutAct_9fa48("11") ? true : (stryCov_9fa48("11", "12"), get(teacher, stryMutAct_9fa48("13") ? "" : (stryCov_9fa48("13"), 'id')))) {
+      if (stryMutAct_9fa48("14")) {
+        {}
+      } else {
+        stryCov_9fa48("14");
+        return TEACHER;
+      }
+    }
+    if (stryMutAct_9fa48("16") ? false : stryMutAct_9fa48("15") ? true : (stryCov_9fa48("15", "16"), get(department, stryMutAct_9fa48("17") ? "" : (stryCov_9fa48("17"), 'id')))) {
+      if (stryMutAct_9fa48("18")) {
+        {}
+      } else {
+        stryCov_9fa48("18");
+        return DEPARTMENT;
+      }
+    }
+    return FULL;
+  }
+};
